@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
+  Animated,
+  Image,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,39 +14,109 @@ import { SafeAreaView } from 'react-native-safe-area-context';
  * Transcript and "listening" state are static placeholders for now.
  */
 export function SpeechToTextScreen() {
+  const settingsSlideX = useRef(new Animated.Value(0)).current;
+
+  const handleSettingsPress = () => {
+    settingsSlideX.setValue(18);
+    Animated.spring(settingsSlideX, {
+      toValue: 0,
+      mass: 1,
+      stiffness: 711.1,
+      damping: 40,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right', 'bottom']}>
       <View style={styles.header}>
-        <Text style={styles.title}>Speech to text</Text>
-        <Text style={styles.subtitle}>UI preview — no recording yet</Text>
+        <View style={styles.headerRow}>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>ხმა</Text>
+            <Image
+              source={require('../../IMG/arrows.png')}
+              style={styles.titleArrowsIcon}
+              resizeMode="contain"
+            />
+            <Text style={styles.title}>ტექსტი</Text>
+          </View>
+
+          <Animated.View style={[styles.settingsIconWrap, { transform: [{ translateX: settingsSlideX }] }]}>
+            <Pressable
+              onPress={handleSettingsPress}
+              style={({ pressed }) => [
+                styles.settingsButton,
+                pressed && styles.settingsButtonPressed,
+              ]}>
+              <Image
+                source={require('../../IMG/Vector.png')}
+                style={styles.settingsIconImage}
+                resizeMode="contain"
+              />
+            </Pressable>
+          </Animated.View>
+        </View>
       </View>
 
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled">
-        <View style={styles.transcriptCard}>
-          <Text style={styles.label}>Transcript</Text>
-          <TextInput
-            style={styles.transcriptInput}
-            value="Your transcribed words will appear here after you hook up speech recognition."
-            editable={false}
-            multiline
-            placeholder="Transcript"
-            placeholderTextColor="#8E8E93"
+      <View style={styles.actionsRow}>
+        <Pressable style={styles.primaryAction}>
+          <Image
+            source={require('../../IMG/Plus.png')}
+            style={styles.primaryActionIcon}
+            resizeMode="contain"
           />
-        </View>
-      </ScrollView>
-
-      <View style={styles.footer}>
-        <Pressable
-          style={({ pressed }) => [
-            styles.micButton,
-            pressed && styles.micButtonPressed,
-          ]}>
-          <Text style={styles.micButtonLabel}>●</Text>
+          <Text style={styles.primaryActionText}>ახლის გახსნა</Text>
         </Pressable>
-        <Text style={styles.hint}>Record button is visual only</Text>
+        <Pressable style={styles.secondaryAction}>
+          <Image
+            source={require('../../IMG/Gear.png')}
+            style={styles.secondaryActionIcon}
+            resizeMode="contain"
+          />
+          <Text style={styles.secondaryActionText}>პარამეტრები</Text>
+        </Pressable>
+      </View>
+
+      <View style={styles.content}>
+        <View style={styles.listenRow}>
+          <Image
+            source={require('../../IMG/microphone.png')}
+            style={styles.listenIcon}
+            resizeMode="contain"
+          />
+          <Text style={styles.listenText}>დაიწყე ჩაწერა...</Text>
+        </View>
+      </View>
+
+      <View style={styles.bottomBar}>
+        <Pressable style={styles.bottomItem}>
+          <Image
+            source={require('../../IMG/FilePlus.png')}
+            style={styles.bottomIconMuted}
+            resizeMode="contain"
+          />
+          <Text style={styles.bottomLabelMuted}>აუდიო ფაილი</Text>
+        </Pressable>
+
+        <Pressable style={styles.bottomItem}>
+          <View style={styles.bottomMicButton}>
+            <Image
+              source={require('../../IMG/Microphone_main.png')}
+              style={styles.bottomMicIcon}
+              resizeMode="contain"
+            />
+          </View>
+          <Text style={styles.bottomLabel}>ჩაწერა</Text>
+        </Pressable>
+
+        <Pressable style={styles.bottomItem}>
+          <Image
+            source={require('../../IMG/logos_youtube-icon.png')}
+            style={styles.youtubeBadge}
+            resizeMode="contain"
+          />
+          <Text style={styles.bottomLabel}>YouTube Link</Text>
+        </Pressable>
       </View>
     </SafeAreaView>
   );
@@ -55,82 +125,165 @@ export function SpeechToTextScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F3F3F6',
+  },
+  settingsIconWrap: {
+    width: 36,
+    height: 36,
+    opacity: 1,
+    transform: [{ rotate: '-180deg' }],
+    zIndex: 20,
+  },
+  settingsButton: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  settingsIconImage: {
+    width: 30,
+    height: 30,
+    tintColor: '#000000',
+  },
+  settingsButtonPressed: {
+    opacity: 0.8,
   },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 8,
+    paddingHorizontal: 16,
+    paddingTop: 10,
     paddingBottom: 16,
+    borderBottomWidth: 1.25,
+    borderBottomColor: '#F0F0F0',
+    backgroundColor: '#F3F3F6',
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   title: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: '700',
     color: '#000000',
   },
-  subtitle: {
-    marginTop: 4,
-    fontSize: 15,
-    color: '#636366',
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 24,
-  },
-  transcriptCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#636366',
-    marginBottom: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  transcriptInput: {
-    minHeight: 200,
-    fontSize: 17,
-    lineHeight: 24,
-    color: '#1C1C1E',
-    textAlignVertical: 'top',
-  },
-  footer: {
+  titleRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    paddingBottom: 28,
+    gap: 8,
+  },
+  titleArrowsIcon: {
+    width: 20,
+    height: 20,
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    gap: 10,
+  },
+  primaryAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2F95F2',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    height: 28,
+    justifyContent: 'center',
+    gap: 6,
+  },
+  primaryActionIcon: {
+    width: 14,
+    height: 14,
+    tintColor: '#FFFFFF',
+  },
+  primaryActionText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  secondaryAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#1B72B4',
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    height: 28,
+    justifyContent: 'center',
+    gap: 6,
+  },
+  secondaryActionIcon: {
+    width: 17,
+    height: 17,
+    tintColor: '#23557D',
+  },
+  secondaryActionText: {
+    color: '#1B72B4',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 10,
+  },
+  listenRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  listenIcon: {
+    width: 18,
+    height: 18,
+  },
+  listenText: {
+    fontSize: 32,
+    color: '#1F1F23',
+    fontWeight: '400',
+  },
+  bottomBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 10,
     backgroundColor: '#FFFFFF',
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: '#C6C6C8',
   },
-  micButton: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: '#007AFF',
+  bottomItem: {
+    alignItems: 'center',
+  },
+  bottomIconMuted: {
+    width: 34,
+    height: 34,
+  },
+  bottomMicButton: {
+    width: 52,
+    height: 52,
+    borderRadius: 10,
+    backgroundColor: '#42A5F5',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  micButtonPressed: {
-    opacity: 0.85,
+  bottomMicIcon: {
+    width: 26,
+    height: 26,
   },
-  micButtonLabel: {
-    fontSize: 28,
-    color: '#FFFFFF',
+  youtubeBadge: {
+    width: 40,
+    height: 28,
   },
-  hint: {
-    marginTop: 12,
-    fontSize: 13,
+  bottomLabel: {
+    marginTop: 6,
+    fontSize: 12,
+    color: '#6A6A6F',
+  },
+  bottomLabelMuted: {
+    marginTop: 6,
+    fontSize: 12,
     color: '#8E8E93',
   },
 });
