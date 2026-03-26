@@ -89,34 +89,36 @@ export function SpeechToTextScreen() {
       </View>
 
       <View style={styles.bottomBar}>
-        <Pressable style={styles.bottomItem}>
-          <Image
-            source={require('../../IMG/FilePlus.png')}
-            style={styles.bottomIconMuted}
-            resizeMode="contain"
-          />
-          <Text style={styles.bottomLabelMuted}>აუდიო ფაილი</Text>
-        </Pressable>
-
-        <Pressable style={styles.bottomItem}>
-          <View style={styles.bottomMicButton}>
+        <View style={styles.bottomBarInner}>
+          <Pressable style={styles.bottomItem}>
             <Image
-              source={require('../../IMG/Microphone_main.png')}
-              style={styles.bottomMicIcon}
+              source={require('../../IMG/FilePlus.png')}
+              style={styles.bottomIconMuted}
               resizeMode="contain"
             />
-          </View>
-          <Text style={styles.bottomLabel}>ჩაწერა</Text>
-        </Pressable>
+            <Text style={styles.bottomLabelMuted}>აუდიო ფაილი</Text>
+          </Pressable>
 
-        <Pressable style={styles.bottomItem}>
-          <Image
-            source={require('../../IMG/logos_youtube-icon.png')}
-            style={styles.youtubeBadge}
-            resizeMode="contain"
-          />
-          <Text style={styles.bottomLabel}>YouTube Link</Text>
-        </Pressable>
+          <Pressable style={styles.bottomItem}>
+            <View style={styles.bottomMicButton}>
+              <Image
+              source={require('../../IMG/microphone-new.png')}
+                style={styles.bottomMicIcon}
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={styles.bottomLabel}>ჩაწერა</Text>
+          </Pressable>
+
+          <Pressable style={styles.bottomItem}>
+            <Image
+              source={require('../../IMG/logos_youtube-icon.png')}
+              style={styles.youtubeBadge}
+              resizeMode="contain"
+            />
+            <Text style={[styles.bottomLabel, styles.youtubeLabel]}>YouTube Link</Text>
+          </Pressable>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -125,7 +127,7 @@ export function SpeechToTextScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#F3F3F6',
+    backgroundColor: '#FAFAFA',
   },
   settingsIconWrap: {
     width: 36,
@@ -154,7 +156,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     borderBottomWidth: 1.25,
     borderBottomColor: '#F0F0F0',
-    backgroundColor: '#F3F3F6',
+    backgroundColor: '#FAFAFA',
   },
   headerRow: {
     flexDirection: 'row',
@@ -163,7 +165,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: '900',
     color: '#000000',
   },
   titleRow: {
@@ -205,7 +207,7 @@ const styles = StyleSheet.create({
   secondaryAction: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#1B72B4',
     borderRadius: 6,
     paddingHorizontal: 10,
@@ -226,39 +228,48 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 10,
+    paddingTop: 27,
   },
   listenRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginBottom: 20,
   },
   listenIcon: {
-    width: 18,
-    height: 18,
+    width: 22,
+    height: 22,
   },
   listenText: {
-    fontSize: 32,
+    fontSize: 18,
     color: '#1F1F23',
     fontWeight: '400',
   },
   bottomBar: {
+    paddingTop: 12,
+    paddingBottom: 7,
+    marginBottom: 45,
+    marginHorizontal: 16,
+    backgroundColor: '#FAFAFA',
+    borderTopWidth: 0,
+  },
+  bottomBarInner: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'flex-end',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 10,
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#C6C6C8',
+    paddingHorizontal: 8,
+    paddingTop: 8,
+    paddingBottom: 7,
+    backgroundColor: '#FAFAFA',
+    borderRadius: 14,
   },
   bottomItem: {
     alignItems: 'center',
   },
   bottomIconMuted: {
-    width: 34,
-    height: 34,
+    width: 40,
+    height: 40,
+    marginTop: 6,
   },
   bottomMicButton: {
     width: 52,
@@ -269,8 +280,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bottomMicIcon: {
-    width: 26,
-    height: 26,
+    width: 30,
+    height: 30,
   },
   youtubeBadge: {
     width: 40,
@@ -281,8 +292,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6A6A6F',
   },
+  youtubeLabel: {
+    marginBottom: 12,
+  },
   bottomLabelMuted: {
-    marginTop: 6,
+    marginTop: 4,
+    marginBottom: 7,
     fontSize: 12,
     color: '#8E8E93',
   },
