@@ -25,6 +25,7 @@ export function SpeechToTextScreen() {
   const [transcriptViewportHeight, setTranscriptViewportHeight] = useState(1);
   const [transcriptContentHeight, setTranscriptContentHeight] = useState(1);
   const [transcriptBarTop, setTranscriptBarTop] = useState(0);
+  const [bottomInnerHeight, setBottomInnerHeight] = useState(0);
   const transcriptText =
     'ტექნოლოგიები ყოველდღიურად იცვლება და ჩვენც მათთან ერთად ვვითარდებით. ზოგჯერ ერთი პატარა იდეაც კი შეიძლება გადაიქცეს დიდ პროექტად, თუ მას სწორად განავითარებ. მნიშვნელოვანია, რომ არ შეგეშინდეს შეცდომების, რადგან სწორედ ისინი გვასწავლიან ყველაზე მეტს. დღეს ბევრად მარტივია ახალი უნარების სწავლა, განსაკუთრებით მაშინ, როცა ინტერნეტი უსაზღვრო რესურსებს გვთავაზობს. მთავარია მოტივაცია და მუდმივი პრაქტიკა — ეს არის წარმატების მთავარი ფორმულა.ნსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტექნოლოგიები ყოველდღიურად იცვლება და ჩვენც მათთან ერთად ვვითარდებით. ზოგჯერ ერთი პატარა იდეაც კი შეიძლება გადაიქცესია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფ';
 
@@ -37,6 +38,16 @@ export function SpeechToTextScreen() {
       damping: 40,
       useNativeDriver: true,
     }).start();
+  };
+
+  const handleNewFilePress = () => {
+    setIsRecording(false);
+    setHasRecordedOnce(false);
+    setIsMiniPlaying(false);
+    recordAnim.stopAnimation();
+    recordAnim.setValue(0);
+    setTranscriptBarTop(0);
+    transcriptScrollRef.current?.scrollTo({ y: 0, animated: false });
   };
 
   const handleRecordPress = () => {
@@ -118,7 +129,7 @@ export function SpeechToTextScreen() {
       </View>
 
       <View style={styles.actionsRow}>
-        <Pressable style={styles.primaryAction}>
+        <Pressable style={styles.primaryAction} onPress={handleNewFilePress}>
           <Image
             source={require('../../IMG/Plus.png')}
             style={styles.primaryActionIcon}
@@ -169,7 +180,7 @@ export function SpeechToTextScreen() {
 
       <View style={styles.bottomBar}>
         {hasRecordedOnce && !isRecording ? (
-          <View style={styles.miniPlayerWrap}>
+          <View style={[styles.miniPlayerWrap, { bottom: bottomInnerHeight + 16 }]}>
             <View style={styles.miniPlayerTopRow}>
               <View style={styles.miniPlayerLeftCol}>
                 <Pressable
@@ -197,7 +208,9 @@ export function SpeechToTextScreen() {
           </View>
         ) : null}
 
-        <View style={styles.bottomBarInner}>
+        <View
+          style={styles.bottomBarInner}
+          onLayout={event => setBottomInnerHeight(event.nativeEvent.layout.height)}>
           <Pressable style={styles.bottomItem}>
             <Image
               source={require('../../IMG/FilePlus.png')}
@@ -395,18 +408,23 @@ const styles = StyleSheet.create({
     height: 129,
     paddingTop: 12,
     paddingBottom: 7,
-    marginBottom: 45,
+    marginBottom: 20,
     marginHorizontal: 16,
     backgroundColor: '#FAFAFA',
     borderTopWidth: 0,
+    position: 'relative',
   },
   miniPlayerWrap: {
-    marginTop: 10,
-    marginBottom: 2,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    paddingLeft: 7,
+    paddingRight: 5,
+    paddingTop: 10,
   },
   miniPlayerTopRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   miniPlayerLeftCol: {
     alignItems: 'center',
@@ -418,6 +436,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2FA2FE',
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: -24.63,
   },
   pauseIconWrap: {
     flexDirection: 'row',
@@ -442,15 +461,16 @@ const styles = StyleSheet.create({
   },
   miniTimeLabel: {
     marginTop: 6,
-    fontSize: 16,
+    fontSize: 13,
+    fontWeight: '400',
     color: '#000000',
   },
   miniProgressCol: {
     flex: 1,
     alignItems: 'flex-start',
-    marginLeft: 5,
+    marginLeft: 10.37,
     marginRight: 16,
-    marginTop: 9,
+    marginTop: 0,
   },
   miniProgressTrack: {
     width: '100%',
@@ -464,20 +484,24 @@ const styles = StyleSheet.create({
     height: 14,
     borderRadius: 7,
     backgroundColor: '#2FA2FE',
-    top: -6,
+    top: -4.5,
   },
   miniProgressLine: {
     width: '100%',
-    height: 2,
+    height: 5,
     backgroundColor: '#D9D9D9',
   },
   bottomBarInner: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'flex-end',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
     paddingHorizontal: 8,
     paddingTop: 8,
-    paddingBottom: 7,
+    paddingBottom: 0,
     backgroundColor: '#FAFAFA',
     borderRadius: 14,
   },
@@ -518,11 +542,11 @@ const styles = StyleSheet.create({
     color: '#6A6A6F',
   },
   youtubeLabel: {
-    marginBottom: 12,
+    marginBottom: 0,
   },
   bottomLabelMuted: {
     marginTop: 4,
-    marginBottom: 7,
+    marginBottom: 0,
     fontSize: 12,
     color: '#8E8E93',
   },
