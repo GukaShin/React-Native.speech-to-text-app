@@ -8,6 +8,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -31,6 +32,19 @@ export function SpeechToTextScreen() {
   const [bottomInnerHeight, setBottomInnerHeight] = useState(0);
   const [historyVisible, setHistoryVisible] = useState(false);
   const historyAnim = useRef(new Animated.Value(SCREEN_WIDTH)).current;
+  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
+  const settingsModalAnim = useRef(new Animated.Value(0)).current;
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [langSearch, setLangSearch] = useState('');
+  const [selectedLang, setSelectedLang] = useState('ქართული');
+  const [selectedSpeaker, setSelectedSpeaker] = useState('მოსაუბრის გამოყოფა');
+  const [selectedStt, setSelectedStt] = useState('STT1');
+  const [selectedMic, setSelectedMic] = useState('მიკროფონი');
+  const [usePunctuation, setUsePunctuation] = useState(true);
+  const settingsBackup = useRef({lang: 'ქართული', speaker: 'მოსაუბრის გამოყოფა', stt: 'STT1', mic: 'მიკროფონი', punct: true});
+  const [langListViewH, setLangListViewH] = useState(1);
+  const [langListContentH, setLangListContentH] = useState(1);
+  const [langBarTop, setLangBarTop] = useState(0);
 
   const historyGroups = [
     {
@@ -91,6 +105,90 @@ export function SpeechToTextScreen() {
       easing: Easing.in(Easing.cubic),
       useNativeDriver: true,
     }).start(() => setHistoryVisible(false));
+  };
+
+  const languageOptions = ['ფრანგული', 'იაპონური', 'ქართული', 'ინგლისური', 'არაბული', 'მონღოლური', 'გერმანული', 'ჩეჩნური', 'ესპანური'];
+  const allSpeakerOptions = ['მოსაუბრის გამოყოფა', 'მოსაუბრის არ გამოყოფა'];
+  const allSttOptions = ['STT1', 'STT2', 'STT3'];
+  const allMicOptions = ['მიკროფონი', 'სისტემის ხმა'];
+
+  const speakerOptions = allSpeakerOptions.filter(o => o !== selectedSpeaker);
+  const sttOptions = allSttOptions.filter(o => o !== selectedStt);
+  const micOptions = allMicOptions.filter(o => o !== selectedMic);
+
+  const filteredLanguages = languageOptions.filter(l =>
+    l.toLowerCase().includes(langSearch.toLowerCase()),
+  );
+
+  const settingsOverlayOpacity = settingsModalAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 0.5],
+  });
+
+  const settingsSheetY = settingsModalAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [600, 0],
+  });
+
+  const openSettingsModal = () => {
+    settingsBackup.current = {
+      lang: selectedLang, speaker: selectedSpeaker, stt: selectedStt,
+      mic: selectedMic, punct: usePunctuation,
+    };
+    setSettingsModalVisible(true);
+    setActiveDropdown(null);
+    setLangSearch('');
+    settingsModalAnim.setValue(0);
+    Animated.timing(settingsModalAnim, {
+      toValue: 1,
+      duration: 300,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeSettingsModal = () => {
+    Animated.timing(settingsModalAnim, {
+      toValue: 0,
+      duration: 300,
+      easing: Easing.in(Easing.cubic),
+      useNativeDriver: true,
+    }).start(() => {
+      setSettingsModalVisible(false);
+      setActiveDropdown(null);
+      setLangSearch('');
+    });
+  };
+
+  const cancelSettings = () => {
+    const b = settingsBackup.current;
+    setSelectedLang(b.lang);
+    setSelectedSpeaker(b.speaker);
+    setSelectedStt(b.stt);
+    setSelectedMic(b.mic);
+    setUsePunctuation(b.punct);
+    closeSettingsModal();
+  };
+
+  const saveSettings = () => {
+    closeSettingsModal();
+  };
+
+  const toggleDropdown = (name: string) => {
+    setActiveDropdown(prev => prev === name ? null : name);
+    if (name !== 'lang') {
+      setLangSearch('');
+    }
+    setLangBarTop(0);
+  };
+
+  const handleLangListScroll = (event: any) => {
+    const y = event.nativeEvent.contentOffset.y ?? 0;
+    const maxScroll = Math.max(langListContentH - langListViewH, 0);
+    const barH = 22;
+    const trackH = Math.max(langListViewH - 8, 0);
+    const maxTravel = Math.max(trackH - barH, 0);
+    setLangBarTop(maxScroll > 0 ? (y / maxScroll) * maxTravel : 0);
   };
 
   const handleNewFilePress = () => {
@@ -190,7 +288,7 @@ export function SpeechToTextScreen() {
           />
           <Text style={styles.primaryActionText}>ახლის გახსნა</Text>
         </Pressable>
-        <Pressable style={styles.secondaryAction}>
+        <Pressable style={styles.secondaryAction} onPress={openSettingsModal}>
           <Image
             source={require('../../IMG/Gear.png')}
             style={styles.secondaryActionIcon}
@@ -299,6 +397,151 @@ export function SpeechToTextScreen() {
           </Pressable>
         </View>
       </View>
+
+      {settingsModalVisible && (
+        <>
+          <Animated.View
+            style={[styles.settingsOverlay, {opacity: settingsOverlayOpacity}]}
+            pointerEvents="auto">
+            <Pressable style={styles.settingsOverlayPress} onPress={cancelSettings} />
+          </Animated.View>
+          <Animated.View
+            style={[styles.settingsSheet, {transform: [{translateY: settingsSheetY}]}]}>
+            <ScrollView bounces={false} showsVerticalScrollIndicator={false} scrollEnabled={activeDropdown !== 'lang'} nestedScrollEnabled>
+              <View style={[styles.dropdownWrap, {zIndex: activeDropdown === 'lang' ? 10 : 4}]}>
+                <Pressable style={[styles.settingsRow, activeDropdown === 'lang' && styles.settingsRowActiveLang]} onPress={() => toggleDropdown('lang')}>
+                  <Text style={styles.settingsRowText}>{selectedLang}</Text>
+                  <View style={[styles.chevronArrow, activeDropdown === 'lang' && styles.chevronArrowOpen]} />
+                </Pressable>
+                {activeDropdown === 'lang' && (
+                  <View style={[styles.dropdownPanelOverlay, {top: 54}]}>
+                    <View style={styles.searchBarWrap}>
+                      <View style={styles.searchIconWrap}>
+                        <View style={styles.searchIconCircle} />
+                        <View style={styles.searchIconHandle} />
+                      </View>
+                      <TextInput
+                        style={styles.searchInput}
+                        placeholder="ძიება"
+                        placeholderTextColor="#43434396"
+                        value={langSearch}
+                        onChangeText={setLangSearch}
+                      />
+                    </View>
+                    <View style={styles.langListWrap}>
+                      <ScrollView
+                        style={styles.langList}
+                        nestedScrollEnabled
+                        showsVerticalScrollIndicator={false}
+                        keyboardShouldPersistTaps="handled"
+                        overScrollMode="always"
+                        onLayout={e => setLangListViewH(e.nativeEvent.layout.height)}
+                        onContentSizeChange={(_, h) => setLangListContentH(h)}
+                        onScroll={handleLangListScroll}
+                        scrollEventThrottle={16}>
+                        {filteredLanguages.map(lang => (
+                          <Pressable
+                            key={lang}
+                            style={styles.langOption}
+                            onPress={() => { setSelectedLang(lang); setActiveDropdown(null); }}>
+                            <Text style={[styles.langOptionText, selectedLang === lang && styles.langOptionTextSelected]}>
+                              {lang}
+                            </Text>
+                          </Pressable>
+                        ))}
+                      </ScrollView>
+                      <View style={styles.langScrollTrack}>
+                        <View style={[styles.langScrollThumb, {transform: [{translateY: langBarTop}]}]} />
+                      </View>
+                    </View>
+                  </View>
+                )}
+              </View>
+
+              <View style={[styles.dropdownWrap, {zIndex: activeDropdown === 'speaker' ? 10 : 3}]}>
+                <Pressable style={[styles.settingsRow, activeDropdown === 'speaker' && styles.settingsRowActive]} onPress={() => toggleDropdown('speaker')}>
+                  <Text style={styles.settingsRowText}>{selectedSpeaker}</Text>
+                  <View style={[styles.chevronArrow, activeDropdown === 'speaker' && styles.chevronArrowOpen]} />
+                </Pressable>
+                {activeDropdown === 'speaker' && (
+                  <View style={styles.dropdownPanelFlat}>
+                    {speakerOptions.map((opt, idx) => (
+                      <Pressable
+                        key={opt}
+                        style={[styles.dropdownOptionFlat, idx === speakerOptions.length - 1 && styles.dropdownOptionFlatLast]}
+                        onPress={() => { setSelectedSpeaker(opt); setActiveDropdown(null); }}>
+                        <Text style={styles.dropdownOptionFlatText}>{opt}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                )}
+              </View>
+
+              <View style={[styles.dropdownWrap, {zIndex: activeDropdown === 'stt' ? 10 : 2}]}>
+                <Pressable style={[styles.settingsRow, activeDropdown === 'stt' && styles.settingsRowActive]} onPress={() => toggleDropdown('stt')}>
+                  <Text style={styles.settingsRowText}>{selectedStt}</Text>
+                  <View style={[styles.chevronArrow, activeDropdown === 'stt' && styles.chevronArrowOpen]} />
+                </Pressable>
+                {activeDropdown === 'stt' && (
+                  <View style={styles.dropdownPanelFlat}>
+                    {sttOptions.map((opt, idx) => (
+                      <Pressable
+                        key={opt}
+                        style={[styles.dropdownOptionFlat, idx === sttOptions.length - 1 && styles.dropdownOptionFlatLast]}
+                        onPress={() => { setSelectedStt(opt); setActiveDropdown(null); }}>
+                        <Text style={styles.dropdownOptionFlatText}>{opt}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                )}
+              </View>
+
+              <View style={[styles.dropdownWrap, {zIndex: activeDropdown === 'mic' ? 10 : 1}]}>
+                <Pressable style={[styles.settingsRow, activeDropdown === 'mic' && styles.settingsRowActive]} onPress={() => toggleDropdown('mic')}>
+                  <Text style={styles.settingsRowText}>{selectedMic}</Text>
+                  <View style={[styles.chevronArrow, activeDropdown === 'mic' && styles.chevronArrowOpen]} />
+                </Pressable>
+                {activeDropdown === 'mic' && (
+                  <View style={styles.dropdownPanelFlat}>
+                    {micOptions.map((opt, idx) => (
+                      <Pressable
+                        key={opt}
+                        style={[styles.dropdownOptionFlat, idx === micOptions.length - 1 && styles.dropdownOptionFlatLast]}
+                        onPress={() => { setSelectedMic(opt); setActiveDropdown(null); }}>
+                        <Text style={styles.dropdownOptionFlatText}>{opt}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                )}
+              </View>
+
+              <View style={styles.radioRow}>
+                <Pressable style={styles.radioOption} onPress={() => setUsePunctuation(true)}>
+                  <View style={[styles.radioCircle, usePunctuation && styles.radioCircleSelected]}>
+                    {usePunctuation && <Text style={styles.radioCheck}>{'✓'}</Text>}
+                  </View>
+                  <Text style={styles.radioLabel}>პუნქტუაცია</Text>
+                </Pressable>
+                <Pressable style={styles.radioOption} onPress={() => setUsePunctuation(false)}>
+                  <View style={[styles.radioCircle, !usePunctuation && styles.radioCircleSelected]}>
+                    {!usePunctuation && <Text style={styles.radioCheck}>{'✓'}</Text>}
+                  </View>
+                  <Text style={styles.radioLabel}>ავტოკორექტი</Text>
+                </Pressable>
+              </View>
+
+              <View style={styles.settingsButtons}>
+                <Pressable style={styles.cancelBtn} onPress={cancelSettings}>
+                  <Text style={styles.cancelBtnText}>გაუქმება</Text>
+                </Pressable>
+                <Pressable style={styles.saveBtn} onPress={saveSettings}>
+                  <Text style={styles.saveBtnText}>დამახსოვრება</Text>
+                </Pressable>
+              </View>
+            </ScrollView>
+          </Animated.View>
+        </>
+      )}
 
       {historyVisible && (
         <Animated.View
@@ -684,6 +927,271 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#8E8E93',
   },
+  settingsOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#000000',
+    zIndex: 50,
+  },
+  settingsOverlayPress: {
+    flex: 1,
+  },
+  settingsSheet: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+    zIndex: 60,
+    maxHeight: '80%',
+  },
+  dropdownWrap: {
+    position: 'relative',
+    marginBottom: 10,
+  },
+  settingsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: '#434343',
+    borderRadius: 8,
+  },
+  settingsRowActive: {
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    borderColor: '#2FA2FE',
+    position: 'relative',
+    zIndex: 2,
+  },
+  settingsRowText: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#333333',
+  },
+  chevronArrow: {
+    width: 10,
+    height: 10,
+    borderRightWidth: 1.5,
+    borderBottomWidth: 1.5,
+    borderColor: '#434343',
+    transform: [{rotate: '45deg'}],
+    marginBottom: 4,
+  },
+  chevronArrowOpen: {
+    borderColor: '#2FA2FE',
+    transform: [{rotate: '-135deg'}],
+    marginBottom: -2,
+    marginTop: 4,
+  },
+  dropdownPanelOverlay: {
+    position: 'absolute',
+    top: 50,
+    left: 0,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#2FA2FE',
+    borderRadius: 8,
+    paddingTop: 0,
+    paddingBottom: 10,
+    paddingHorizontal: 0,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  dropdownPanelFlat: {
+    position: 'absolute',
+    top: 50,
+    left: 0,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#434343',
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  dropdownOptionFlat: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#434343',
+  },
+  dropdownOptionFlatLast: {
+    borderBottomWidth: 0,
+  },
+  dropdownOptionFlatText: {
+    fontSize: 14,
+    color: '#333333',
+  },
+  searchBarWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 0.5,
+    borderColor: '#43434352',
+    borderRadius: 8,
+    marginTop: 9,
+    marginHorizontal: 4,
+    paddingLeft: 10,
+  },
+  searchIconWrap: {
+    width: 14,
+    height: 14,
+    marginRight: 6,
+    position: 'relative',
+  },
+  searchIconCircle: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 1.5,
+    borderColor: '#434343',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  },
+  searchIconHandle: {
+    width: 5,
+    height: 0,
+    borderTopWidth: 1.5,
+    borderTopColor: '#434343',
+    position: 'absolute',
+    bottom: 1.5,
+    right: 0,
+    transform: [{rotate: '45deg'}],
+  },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 8,
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#333333',
+  },
+  langListWrap: {
+    position: 'relative',
+    maxHeight: 200,
+  },
+  langList: {
+    maxHeight: 200,
+    paddingRight: 14,
+  },
+  langScrollTrack: {
+    position: 'absolute',
+    top: 4,
+    bottom: 4,
+    right: 4,
+    width: 5,
+    backgroundColor: '#CFCFCF',
+    borderRadius: 2.5,
+  },
+  langScrollThumb: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: 5,
+    height: 22,
+    borderRadius: 2.5,
+    backgroundColor: '#2FA2FE',
+  },
+  langOption: {
+    paddingVertical: 4,
+    paddingLeft: 11,
+  },
+  langOptionText: {
+    fontSize: 13,
+    color: '#333333',
+    fontWeight: '400',
+  },
+  langOptionTextSelected: {
+    color: '#2FA2FE',
+    fontWeight: '600',
+  },
+  radioRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    gap: 24,
+  },
+  radioOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  radioCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: '#CCCCCC',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioCircleSelected: {
+    backgroundColor: '#2FA2FE',
+    borderColor: '#2FA2FE',
+  },
+  radioCheck: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+    marginTop: -1,
+  },
+  radioLabel: {
+    fontSize: 13,
+    color: '#333333',
+  },
+  settingsButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+    paddingBottom: 10,
+  },
+  cancelBtn: {
+    flex: 1,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1.5,
+    borderColor: '#2FA2FE',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cancelBtnText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2FA2FE',
+  },
+  saveBtn: {
+    flex: 1,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#2FA2FE',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  saveBtnText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
   historyOverlay: {
     position: 'absolute',
     top: 0,
@@ -823,7 +1331,7 @@ const styles = StyleSheet.create({
     marginLeft: 11,
   },
   historyTrashIcon: {
-    width: 20,
-    height: 20,
+    width: 23,
+    height: 23,
   },
 });
