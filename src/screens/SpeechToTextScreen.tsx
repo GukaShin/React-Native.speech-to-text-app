@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import {
   Animated,
+  Dimensions,
   Easing,
   Image,
   Pressable,
@@ -10,6 +11,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
 /**
  * UI-only shell for speech-to-text. Wire styles and layout to your Figma file.
@@ -26,18 +29,68 @@ export function SpeechToTextScreen() {
   const [transcriptContentHeight, setTranscriptContentHeight] = useState(1);
   const [transcriptBarTop, setTranscriptBarTop] = useState(0);
   const [bottomInnerHeight, setBottomInnerHeight] = useState(0);
+  const [historyVisible, setHistoryVisible] = useState(false);
+  const historyAnim = useRef(new Animated.Value(SCREEN_WIDTH)).current;
+
+  const historyGroups = [
+    {
+      date: 'დღეს',
+      items: [
+        {id: '1', text: 'ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.'},
+        {id: '2', text: 'ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.'},
+      ],
+    },
+    {
+      date: 'გუშინ',
+      items: [
+        {id: '3', text: 'ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.'},
+        {id: '4', text: 'ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.'},
+      ],
+    },
+    {
+      date: '11 მარტი',
+      items: [
+        {id: '5', text: 'ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.'},
+        {id: '6', text: 'ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.'},
+      ],
+    },
+    {
+      date: 'დღეს',
+      items: [
+        {id: '7', text: 'ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.'},
+        {id: '8', text: 'ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.'},
+      ],
+    },
+    {
+      date: 'გუშინ',
+      items: [
+        {id: '9', text: 'ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.'},
+        {id: '10', text: 'ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.'},
+      ],
+    },
+  ];
+
   const transcriptText =
     'ტექნოლოგიები ყოველდღიურად იცვლება და ჩვენც მათთან ერთად ვვითარდებით. ზოგჯერ ერთი პატარა იდეაც კი შეიძლება გადაიქცეს დიდ პროექტად, თუ მას სწორად განავითარებ. მნიშვნელოვანია, რომ არ შეგეშინდეს შეცდომების, რადგან სწორედ ისინი გვასწავლიან ყველაზე მეტს. დღეს ბევრად მარტივია ახალი უნარების სწავლა, განსაკუთრებით მაშინ, როცა ინტერნეტი უსაზღვრო რესურსებს გვთავაზობს. მთავარია მოტივაცია და მუდმივი პრაქტიკა — ეს არის წარმატების მთავარი ფორმულა.ნსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტექნოლოგიები ყოველდღიურად იცვლება და ჩვენც მათთან ერთად ვვითარდებით. ზოგჯერ ერთი პატარა იდეაც კი შეიძლება გადაიქცესია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძლია ჩაწეროს საუბარი და რამდენიმე წამში მიიღოს წასაკითხი ტექსტი.ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფ';
 
   const handleSettingsPress = () => {
-    settingsSlideX.setValue(18);
-    Animated.spring(settingsSlideX, {
+    setHistoryVisible(true);
+    historyAnim.setValue(SCREEN_WIDTH);
+    Animated.timing(historyAnim, {
       toValue: 0,
-      mass: 1,
-      stiffness: 711.1,
-      damping: 40,
+      duration: 300,
+      easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }).start();
+  };
+
+  const handleHistoryClose = () => {
+    Animated.timing(historyAnim, {
+      toValue: SCREEN_WIDTH,
+      duration: 300,
+      easing: Easing.in(Easing.cubic),
+      useNativeDriver: true,
+    }).start(() => setHistoryVisible(false));
   };
 
   const handleNewFilePress = () => {
@@ -246,6 +299,87 @@ export function SpeechToTextScreen() {
           </Pressable>
         </View>
       </View>
+
+      {historyVisible && (
+        <Animated.View
+          style={[
+            styles.historyOverlay,
+            {transform: [{translateX: historyAnim}]},
+          ]}>
+          <View style={styles.historyHeader}>
+            <Pressable onPress={handleHistoryClose} style={styles.historyBackBtn}>
+              <Image
+                source={require('../../IMG/Vector-return.png')}
+                style={styles.historyBackIcon}
+                resizeMode="contain"
+              />
+            </Pressable>
+
+            <View style={styles.historyAvatar}>
+              <Text style={styles.historyAvatarLetter}>A</Text>
+            </View>
+
+            <View style={styles.historyProfileInfo}>
+              <Text style={styles.historyEmail} numberOfLines={1}>
+                achi.teruashvili777@gmail.com
+              </Text>
+              <View style={styles.historyBadge}>
+                <Image
+                  source={require('../../IMG/star.png')}
+                  style={styles.historyBadgeStar}
+                  resizeMode="contain"
+                />
+                <Text style={styles.historyBadgeText}>პრემიუმი</Text>
+              </View>
+            </View>
+
+            <View style={styles.historyHeaderSpacer} />
+
+            <Pressable style={styles.historyLangBtn}>
+              <Image
+                source={require('../../IMG/flag.png')}
+                style={styles.historyFlagIcon}
+                resizeMode="contain"
+              />
+              <Image
+                source={require('../../IMG/Vector-flag.png')}
+                style={styles.historyFlagVectorIcon}
+                resizeMode="contain"
+              />
+            </Pressable>
+          </View>
+
+          <ScrollView
+            style={styles.historyScroll}
+            contentContainerStyle={styles.historyScrollContent}
+            showsVerticalScrollIndicator={false}>
+            {historyGroups.map((group, gIdx) => (
+              <View key={gIdx} style={styles.historyGroup}>
+                <Text style={styles.historyDateLabel}>{group.date}</Text>
+                {group.items.map(item => (
+                  <View key={item.id} style={styles.historyCard}>
+                    <Image
+                      source={require('../../IMG/edit.png')}
+                      style={styles.historyEditIcon}
+                      resizeMode="contain"
+                    />
+                    <Text style={styles.historyCardText} numberOfLines={2}>
+                      {item.text}
+                    </Text>
+                    <Pressable style={styles.historyDeleteBtn}>
+                      <Image
+                        source={require('../../IMG/Trash.png')}
+                        style={styles.historyTrashIcon}
+                        resizeMode="contain"
+                      />
+                    </Pressable>
+                  </View>
+                ))}
+              </View>
+            ))}
+          </ScrollView>
+        </Animated.View>
+      )}
     </SafeAreaView>
   );
 }
@@ -549,5 +683,147 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     fontSize: 12,
     color: '#8E8E93',
+  },
+  historyOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#FFFFFF',
+    zIndex: 100,
+  },
+  historyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingTop: 60,
+    paddingBottom: 14,
+  },
+  historyBackBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 11,
+    marginRight: 21,
+  },
+  historyBackIcon: {
+    width: 24,
+    height: 17,
+  },
+  historyAvatar: {
+    width: 33,
+    height: 33,
+    borderRadius: 16.5,
+    backgroundColor: '#EBEB80',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 6,
+  },
+  historyAvatarLetter: {
+    fontSize: 15,
+    fontWeight: '400',
+    color: '#000000',
+    textAlign: 'center',
+  },
+  historyProfileInfo: {
+    flexShrink: 1,
+  },
+  historyEmail: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#000000',
+  },
+  historyBadge: {
+    backgroundColor: '#3AD2A7',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    alignSelf: 'flex-start',
+    marginTop: 4,
+    overflow: 'visible',
+  },
+  historyBadgeStar: {
+    position: 'absolute',
+    top: -3,
+    right: -3,
+    width: 9,
+    height: 9,
+    transform: [{rotate: '-15deg'}],
+  },
+  historyBadgeText: {
+    fontSize: 10,
+    fontWeight: '400',
+    color: '#000000',
+    textAlign: 'center',
+  },
+  historyHeaderSpacer: {
+    flex: 1,
+  },
+  historyLangBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  historyFlagIcon: {
+    width: 23,
+    height: 23,
+  },
+  historyFlagVectorIcon: {
+    width: 8.12,
+    height: 4.06,
+    marginLeft: 5,
+    marginRight: 11,
+  },
+  historyScroll: {
+    flex: 1,
+  },
+  historyScrollContent: {
+    paddingHorizontal: 0,
+    paddingTop: 4,
+    paddingBottom: 30,
+  },
+  historyGroup: {
+    marginBottom: 4,
+  },
+  historyDateLabel: {
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#9E9E9E',
+    marginBottom: 8,
+    marginTop: 10,
+    marginHorizontal: 16,
+  },
+  historyCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#2FA2FE',
+    height: 57,
+    paddingLeft: 12,
+    paddingRight: 14,
+    marginHorizontal: 16,
+    marginBottom: 8,
+  },
+  historyEditIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 11,
+  },
+  historyCardText: {
+    flex: 1,
+    fontSize: 10,
+    fontWeight: '700',
+    lineHeight: 14,
+    color: '#1F1F23',
+  },
+  historyDeleteBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 11,
+  },
+  historyTrashIcon: {
+    width: 20,
+    height: 20,
   },
 });
