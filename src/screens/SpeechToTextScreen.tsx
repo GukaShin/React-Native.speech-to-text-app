@@ -180,7 +180,7 @@ export function SpeechToTextScreen() {
 
       <View style={styles.bottomBar}>
         {hasRecordedOnce && !isRecording ? (
-          <View style={[styles.miniPlayerWrap, { bottom: bottomInnerHeight + 16 }]}>
+          <View style={[styles.miniPlayerWrap, { bottom: bottomInnerHeight }]}>
             <View style={styles.miniPlayerTopRow}>
               <View style={styles.miniPlayerLeftCol}>
                 <Pressable
@@ -211,7 +211,7 @@ export function SpeechToTextScreen() {
         <View
           style={styles.bottomBarInner}
           onLayout={event => setBottomInnerHeight(event.nativeEvent.layout.height)}>
-          <Pressable style={styles.bottomItem}>
+          <Pressable style={[styles.bottomItem, {marginBottom: 5}]}>
             <Image
               source={require('../../IMG/FilePlus.png')}
               style={styles.bottomIconMuted}
@@ -236,7 +236,7 @@ export function SpeechToTextScreen() {
             <Text style={styles.bottomLabel}>ჩაწერა</Text>
           </Pressable>
 
-          <Pressable style={styles.bottomItem}>
+          <Pressable style={[styles.bottomItem, {marginBottom: 5}]}>
             <Image
               source={require('../../IMG/logos_youtube-icon.png')}
               style={styles.youtubeBadge}
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
   },
   bottomBar: {
     height: 129,
-    paddingTop: 12,
+    paddingTop: 10,
     paddingBottom: 7,
     marginBottom: 20,
     marginHorizontal: 16,
@@ -500,8 +500,8 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     paddingHorizontal: 8,
-    paddingTop: 8,
-    paddingBottom: 0,
+    paddingTop: 0,
+    paddingBottom: 10,
     backgroundColor: '#FAFAFA',
     borderRadius: 14,
   },
@@ -509,9 +509,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bottomIconMuted: {
-    width: 40,
-    height: 40,
-    marginTop: 6,
+    width: 50,
+    height: 50,
+    marginTop: 0,
   },
   bottomMicButton: {
     width: 52,
@@ -533,8 +533,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   youtubeBadge: {
-    width: 40,
-    height: 28,
+    width: 50,
+    height: 35,
   },
   bottomLabel: {
     marginTop: 6,
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   bottomLabelMuted: {
-    marginTop: 4,
+    marginTop: 0,
     marginBottom: 0,
     fontSize: 12,
     color: '#8E8E93',
