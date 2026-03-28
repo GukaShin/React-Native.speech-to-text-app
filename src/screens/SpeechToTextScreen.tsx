@@ -320,7 +320,9 @@ export function SpeechToTextScreen() {
               overScrollMode="never">
               <Text style={styles.transcriptText}>{transcriptText}</Text>
             </ScrollView>
-            <View style={[styles.transcriptScrollBar, { transform: [{ translateY: transcriptBarTop }] }]} />
+            <View style={styles.transcriptScrollTrack}>
+              <View style={[styles.transcriptScrollBar, { transform: [{ translateY: transcriptBarTop }] }]} />
+            </View>
           </View>
         ) : (
           <View style={styles.listenRow}>
@@ -368,15 +370,11 @@ export function SpeechToTextScreen() {
           style={styles.bottomBarInner}
           onLayout={event => setBottomInnerHeight(event.nativeEvent.layout.height)}>
           <Pressable style={[styles.bottomItem, {marginBottom: 5}]}>
-            <View style={styles.filePlusWrap}>
-              <View style={styles.filePlusBody}>
-                <View style={styles.filePlusFold} />
-                <View style={styles.filePlusCenter}>
-                  <View style={styles.filePlusH} />
-                  <View style={styles.filePlusV} />
-                </View>
-              </View>
-            </View>
+            <Image
+              source={require('../../IMG/FilePlus.png')}
+              style={styles.bottomIconMuted}
+              resizeMode="contain"
+            />
             <Text style={styles.bottomLabelMuted}>აუდიო ფაილი</Text>
           </Pressable>
 
@@ -819,10 +817,19 @@ const styles = StyleSheet.create({
   transcriptContent: {
     paddingBottom: 8,
   },
+  transcriptScrollTrack: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    right: 0,
+    width: 7,
+    borderRadius: 4,
+    backgroundColor: '#FFFFFF',
+  },
   transcriptScrollBar: {
     position: 'absolute',
     top: 0,
-    right: 15,
+    left: 0,
     width: 7,
     height: 25,
     borderRadius: 4,
