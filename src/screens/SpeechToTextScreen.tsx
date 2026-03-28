@@ -254,11 +254,16 @@ export function SpeechToTextScreen() {
         <View style={styles.headerRow}>
           <View style={styles.titleRow}>
             <Text style={styles.title}>ხმა</Text>
-            <Image
-              source={require('../../IMG/arrows.png')}
-              style={styles.titleArrowsIcon}
-              resizeMode="contain"
-            />
+            <View style={styles.titleArrowsIcon}>
+              <View style={styles.arrowRowRight}>
+                <View style={styles.arrowLine} />
+                <View style={styles.arrowHeadRight} />
+              </View>
+              <View style={styles.arrowRowLeft}>
+                <View style={styles.arrowHeadLeft} />
+                <View style={styles.arrowLine} />
+              </View>
+            </View>
             <Text style={styles.title}>ტექსტი</Text>
           </View>
 
@@ -363,11 +368,15 @@ export function SpeechToTextScreen() {
           style={styles.bottomBarInner}
           onLayout={event => setBottomInnerHeight(event.nativeEvent.layout.height)}>
           <Pressable style={[styles.bottomItem, {marginBottom: 5}]}>
-            <Image
-              source={require('../../IMG/FilePlus.png')}
-              style={styles.bottomIconMuted}
-              resizeMode="contain"
-            />
+            <View style={styles.filePlusWrap}>
+              <View style={styles.filePlusBody}>
+                <View style={styles.filePlusFold} />
+                <View style={styles.filePlusCenter}>
+                  <View style={styles.filePlusH} />
+                  <View style={styles.filePlusV} />
+                </View>
+              </View>
+            </View>
             <Text style={styles.bottomLabelMuted}>აუდიო ფაილი</Text>
           </Pressable>
 
@@ -413,49 +422,6 @@ export function SpeechToTextScreen() {
                   <Text style={styles.settingsRowText}>{selectedLang}</Text>
                   <View style={[styles.chevronArrow, activeDropdown === 'lang' && styles.chevronArrowOpen]} />
                 </Pressable>
-                {activeDropdown === 'lang' && (
-                  <View style={[styles.dropdownPanelOverlay, {top: 54}]}>
-                    <View style={styles.searchBarWrap}>
-                      <View style={styles.searchIconWrap}>
-                        <View style={styles.searchIconCircle} />
-                        <View style={styles.searchIconHandle} />
-                      </View>
-                      <TextInput
-                        style={styles.searchInput}
-                        placeholder="ძიება"
-                        placeholderTextColor="#43434396"
-                        value={langSearch}
-                        onChangeText={setLangSearch}
-                      />
-                    </View>
-                    <View style={styles.langListWrap}>
-                      <ScrollView
-                        style={styles.langList}
-                        nestedScrollEnabled
-                        showsVerticalScrollIndicator={false}
-                        keyboardShouldPersistTaps="handled"
-                        overScrollMode="always"
-                        onLayout={e => setLangListViewH(e.nativeEvent.layout.height)}
-                        onContentSizeChange={(_, h) => setLangListContentH(h)}
-                        onScroll={handleLangListScroll}
-                        scrollEventThrottle={16}>
-                        {filteredLanguages.map(lang => (
-                          <Pressable
-                            key={lang}
-                            style={styles.langOption}
-                            onPress={() => { setSelectedLang(lang); setActiveDropdown(null); }}>
-                            <Text style={[styles.langOptionText, selectedLang === lang && styles.langOptionTextSelected]}>
-                              {lang}
-                            </Text>
-                          </Pressable>
-                        ))}
-                      </ScrollView>
-                      <View style={styles.langScrollTrack}>
-                        <View style={[styles.langScrollThumb, {transform: [{translateY: langBarTop}]}]} />
-                      </View>
-                    </View>
-                  </View>
-                )}
               </View>
 
               <View style={[styles.dropdownWrap, {zIndex: activeDropdown === 'speaker' ? 10 : 3}]}>
@@ -518,13 +484,13 @@ export function SpeechToTextScreen() {
               <View style={styles.radioRow}>
                 <Pressable style={styles.radioOption} onPress={() => setUsePunctuation(true)}>
                   <View style={[styles.radioCircle, usePunctuation && styles.radioCircleSelected]}>
-                    {usePunctuation && <Text style={styles.radioCheck}>{'✓'}</Text>}
+                    {usePunctuation && <View style={styles.checkmark} />}
                   </View>
                   <Text style={styles.radioLabel}>პუნქტუაცია</Text>
                 </Pressable>
                 <Pressable style={styles.radioOption} onPress={() => setUsePunctuation(false)}>
                   <View style={[styles.radioCircle, !usePunctuation && styles.radioCircleSelected]}>
-                    {!usePunctuation && <Text style={styles.radioCheck}>{'✓'}</Text>}
+                    {!usePunctuation && <View style={styles.checkmark} />}
                   </View>
                   <Text style={styles.radioLabel}>ავტოკორექტი</Text>
                 </Pressable>
@@ -539,6 +505,48 @@ export function SpeechToTextScreen() {
                 </Pressable>
               </View>
             </ScrollView>
+            {activeDropdown === 'lang' && (
+              <View style={styles.langPanelFloat}>
+                <View style={styles.searchBarWrap}>
+                  <View style={styles.searchIconWrap}>
+                    <View style={styles.searchIconCircle} />
+                    <View style={styles.searchIconHandle} />
+                  </View>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="ძიება"
+                    placeholderTextColor="#43434396"
+                    value={langSearch}
+                    onChangeText={setLangSearch}
+                  />
+                </View>
+                <View style={styles.langListWrap}>
+                  <ScrollView
+                    style={styles.langList}
+                    nestedScrollEnabled
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                    onLayout={e => setLangListViewH(e.nativeEvent.layout.height)}
+                    onContentSizeChange={(_, h) => setLangListContentH(h)}
+                    onScroll={handleLangListScroll}
+                    scrollEventThrottle={16}>
+                    {filteredLanguages.map(lang => (
+                      <Pressable
+                        key={lang}
+                        style={styles.langOption}
+                        onPress={() => { setSelectedLang(lang); setActiveDropdown(null); }}>
+                        <Text style={[styles.langOptionText, selectedLang === lang && styles.langOptionTextSelected]}>
+                          {lang}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+                  <View style={styles.langScrollTrack}>
+                    <View style={[styles.langScrollThumb, {transform: [{translateY: langBarTop}]}]} />
+                  </View>
+                </View>
+              </View>
+            )}
           </Animated.View>
         </>
       )}
@@ -610,11 +618,14 @@ export function SpeechToTextScreen() {
                       {item.text}
                     </Text>
                     <Pressable style={styles.historyDeleteBtn}>
-                      <Image
-                        source={require('../../IMG/Trash.png')}
-                        style={styles.historyTrashIcon}
-                        resizeMode="contain"
-                      />
+                      <View style={styles.trashIconWrap}>
+                        <View style={styles.trashLid} />
+                        <View style={styles.trashHandle} />
+                        <View style={styles.trashBody}>
+                          <View style={styles.trashLine} />
+                          <View style={styles.trashLine} />
+                        </View>
+                      </View>
                     </Pressable>
                   </View>
                 ))}
@@ -678,7 +689,43 @@ const styles = StyleSheet.create({
   },
   titleArrowsIcon: {
     width: 20,
-    height: 20,
+    height: 18,
+    justifyContent: 'center',
+    gap: 3,
+  },
+  arrowRowRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  arrowRowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  arrowLine: {
+    flex: 1,
+    height: 0,
+    borderTopWidth: 1.5,
+    borderTopColor: '#333333',
+  },
+  arrowHeadRight: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 3.5,
+    borderBottomWidth: 3.5,
+    borderLeftWidth: 5,
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderLeftColor: '#333333',
+  },
+  arrowHeadLeft: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 3.5,
+    borderBottomWidth: 3.5,
+    borderRightWidth: 5,
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderRightColor: '#333333',
   },
   actionsRow: {
     flexDirection: 'row',
@@ -967,6 +1014,9 @@ const styles = StyleSheet.create({
     borderColor: '#434343',
     borderRadius: 8,
   },
+  settingsRowActiveLang: {
+    borderColor: '#2FA2FE',
+  },
   settingsRowActive: {
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
@@ -1086,6 +1136,19 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#333333',
   },
+  langPanelFloat: {
+    position: 'absolute',
+    top: 74,
+    left: 20,
+    right: 20,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#2FA2FE',
+    borderRadius: 8,
+    paddingBottom: 10,
+    elevation: 5,
+    zIndex: 20,
+  },
   langListWrap: {
     position: 'relative',
     maxHeight: 200,
@@ -1129,7 +1192,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 16,
-    gap: 24,
+    gap: 80,
   },
   radioOption: {
     flexDirection: 'row',
@@ -1140,23 +1203,25 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 11,
-    borderWidth: 2,
-    borderColor: '#CCCCCC',
+    backgroundColor: '#48484859',
     alignItems: 'center',
     justifyContent: 'center',
   },
   radioCircleSelected: {
-    backgroundColor: '#2FA2FE',
-    borderColor: '#2FA2FE',
+    backgroundColor: '#2079C0',
   },
-  radioCheck: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '700',
+  checkmark: {
+    width: 10,
+    height: 6,
+    borderLeftWidth: 2,
+    borderBottomWidth: 2,
+    borderColor: '#FFFFFF',
+    transform: [{rotate: '-45deg'}],
     marginTop: -1,
   },
   radioLabel: {
     fontSize: 13,
+    fontWeight: '700',
     color: '#333333',
   },
   settingsButtons: {
@@ -1168,22 +1233,21 @@ const styles = StyleSheet.create({
   cancelBtn: {
     flex: 1,
     height: 44,
-    borderRadius: 22,
-    borderWidth: 1.5,
-    borderColor: '#2FA2FE',
+    borderRadius: 10,
+    backgroundColor: '#E0F1FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelBtnText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#2FA2FE',
+    color: '#2079C0',
   },
   saveBtn: {
     flex: 1,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: '#2FA2FE',
+    borderRadius: 10,
+    backgroundColor: '#2079C0',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1283,6 +1347,7 @@ const styles = StyleSheet.create({
   },
   historyScroll: {
     flex: 1,
+    backgroundColor: '#FAFAFA',
   },
   historyScrollContent: {
     paddingHorizontal: 0,
@@ -1330,8 +1395,46 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: 11,
   },
-  historyTrashIcon: {
-    width: 23,
-    height: 23,
+  trashIconWrap: {
+    width: 20,
+    height: 22,
+    alignItems: 'center',
+  },
+  trashLid: {
+    width: 18,
+    height: 0,
+    borderTopWidth: 1.5,
+    borderTopColor: '#434343',
+    marginTop: 3,
+  },
+  trashHandle: {
+    position: 'absolute',
+    top: 0,
+    width: 8,
+    height: 3,
+    borderWidth: 1.5,
+    borderBottomWidth: 0,
+    borderColor: '#434343',
+    borderTopLeftRadius: 2,
+    borderTopRightRadius: 2,
+  },
+  trashBody: {
+    width: 14,
+    height: 14,
+    borderWidth: 1.5,
+    borderTopWidth: 0,
+    borderColor: '#434343',
+    borderBottomLeftRadius: 3,
+    borderBottomRightRadius: 3,
+    marginTop: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    paddingTop: 2,
+  },
+  trashLine: {
+    width: 0,
+    height: 8,
+    borderLeftWidth: 1.5,
+    borderLeftColor: '#434343',
   },
 });
