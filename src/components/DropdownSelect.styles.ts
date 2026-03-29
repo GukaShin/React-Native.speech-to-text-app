@@ -1,0 +1,76 @@
+import { StyleSheet } from 'react-native';
+
+export const styles = StyleSheet.create({
+  dropdownWrap: {
+    position: 'relative',
+    marginBottom: 10,
+  },
+  settingsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: '#434343',
+    borderRadius: 8,
+  },
+  settingsRowActive: {
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    borderColor: '#2FA2FE',
+    position: 'relative',
+    zIndex: 2,
+  },
+  settingsRowText: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#333333',
+  },
+  chevronArrow: {
+    width: 10,
+    height: 10,
+    borderRightWidth: 1.5,
+    borderBottomWidth: 1.5,
+    borderColor: '#434343',
+    transform: [{rotate: '45deg'}],
+    marginBottom: 4,
+  },
+  chevronArrowOpen: {
+    borderColor: '#2FA2FE',
+    transform: [{rotate: '-135deg'}],
+    marginBottom: -2,
+    marginTop: 4,
+  },
+  dropdownPanelFlat: {
+    position: 'absolute',
+    top: 50,
+    left: 0,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#434343',
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  dropdownOptionFlat: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#434343',
+  },
+  dropdownOptionFlatLast: {
+    borderBottomWidth: 0,
+  },
+  dropdownOptionFlatText: {
+    fontSize: 14,
+    color: '#333333',
+  },
+});
