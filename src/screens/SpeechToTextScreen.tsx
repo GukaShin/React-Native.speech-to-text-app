@@ -1,22 +1,22 @@
 import React from 'react';
-import { Image, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { HISTORY_GROUPS, TRANSCRIPT_TEXT } from '../constants/data';
-import { useHistoryPanel } from '../hooks/useHistoryPanel';
-import { useRecording } from '../hooks/useRecording';
-import { useSettingsModal } from '../hooks/useSettingsModal';
-import { ActionsRow } from '../components/ActionsRow';
-import { BottomBar } from '../components/BottomBar';
-import { Header } from '../components/Header';
-import { HistoryPanel } from '../components/HistoryPanel';
-import { SettingsModal } from '../components/SettingsModal';
-import { TranscriptView } from '../components/TranscriptView';
-import { styles } from './SpeechToTextScreen.styles';
+import {Image, Text, View} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {HISTORY_GROUPS, TRANSCRIPT_TEXT} from '../constants/data';
+import {useHistoryPanel} from '../hooks/useHistoryPanel';
+import {useRecording} from '../hooks/useRecording';
+import {SettingsProvider, useSettings} from '../context/SettingsContext';
+import {ActionsRow} from '../components/ActionsRow';
+import {BottomBar} from '../components/BottomBar';
+import {Header} from '../components/Header';
+import {HistoryPanel} from '../components/HistoryPanel';
+import {SettingsModal} from '../components/SettingsModal';
+import {TranscriptView} from '../components/TranscriptView';
+import {styles} from './SpeechToTextScreen.styles';
 
-export function SpeechToTextScreen() {
+function SpeechToTextContent() {
   const recording = useRecording();
   const history = useHistoryPanel();
-  const settings = useSettingsModal();
+  const {openModal} = useSettings();
 
   const handleNewFilePress = () => {
     recording.resetRecording();
@@ -25,12 +25,14 @@ export function SpeechToTextScreen() {
   const showTranscript = recording.hasRecordedOnce || recording.isRecording;
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView
+      style={styles.safe}
+      edges={['top', 'left', 'right', 'bottom']}>
       <Header onHistoryPress={history.openHistory} />
 
       <ActionsRow
         onNewFilePress={handleNewFilePress}
-        onSettingsPress={settings.openSettingsModal}
+        onSettingsPress={openModal}
       />
 
       <View
@@ -61,28 +63,7 @@ export function SpeechToTextScreen() {
         recordButtonScale={recording.recordButtonScale}
       />
 
-      <SettingsModal
-        settingsModalVisible={settings.settingsModalVisible}
-        settingsOverlayOpacity={settings.settingsOverlayOpacity}
-        settingsSheetY={settings.settingsSheetY}
-        activeDropdown={settings.activeDropdown}
-        setActiveDropdown={settings.setActiveDropdown}
-        langSearch={settings.langSearch}
-        setLangSearch={settings.setLangSearch}
-        selectedLang={settings.selectedLang}
-        setSelectedLang={settings.setSelectedLang}
-        selectedSpeaker={settings.selectedSpeaker}
-        setSelectedSpeaker={settings.setSelectedSpeaker}
-        selectedStt={settings.selectedStt}
-        setSelectedStt={settings.setSelectedStt}
-        selectedMic={settings.selectedMic}
-        setSelectedMic={settings.setSelectedMic}
-        usePunctuation={settings.usePunctuation}
-        setUsePunctuation={settings.setUsePunctuation}
-        cancelSettings={settings.cancelSettings}
-        saveSettings={settings.saveSettings}
-        toggleDropdown={settings.toggleDropdown}
-      />
+      <SettingsModal />
 
       <HistoryPanel
         visible={history.historyVisible}
@@ -91,5 +72,13 @@ export function SpeechToTextScreen() {
         groups={HISTORY_GROUPS}
       />
     </SafeAreaView>
+  );
+}
+
+export function SpeechToTextScreen() {
+  return (
+    <SettingsProvider>
+      <SpeechToTextContent />
+    </SettingsProvider>
   );
 }

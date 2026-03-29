@@ -1,91 +1,71 @@
 import React from 'react';
-import { Animated, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
-import { useCustomScrollbar } from '../hooks/useCustomScrollbar';
+import {Animated, Pressable, ScrollView, Text, TextInput, View} from 'react-native';
+import {useCustomScrollbar} from '../hooks/useCustomScrollbar';
+import {useSettings} from '../context/SettingsContext';
 import {
   LANGUAGE_OPTIONS,
   MIC_OPTIONS,
   SPEAKER_OPTIONS,
   STT_OPTIONS,
 } from '../constants/data';
-import { DropdownSelect } from './DropdownSelect';
-import { styles } from './SettingsModal.styles';
+import {DropdownSelect} from './DropdownSelect';
+import {styles} from './SettingsModal.styles';
 
-interface SettingsModalProps {
-  settingsModalVisible: boolean;
-  settingsOverlayOpacity: Animated.AnimatedInterpolation<string | number>;
-  settingsSheetY: Animated.AnimatedInterpolation<string | number>;
-  activeDropdown: string | null;
-  langSearch: string;
-  setLangSearch: (text: string) => void;
-  selectedLang: string;
-  setSelectedLang: (lang: string) => void;
-  selectedSpeaker: string;
-  setSelectedSpeaker: (speaker: string) => void;
-  selectedStt: string;
-  setSelectedStt: (stt: string) => void;
-  selectedMic: string;
-  setSelectedMic: (mic: string) => void;
-  usePunctuation: boolean;
-  setUsePunctuation: (value: boolean) => void;
-  setActiveDropdown: (value: string | null) => void;
-  cancelSettings: () => void;
-  saveSettings: () => void;
-  toggleDropdown: (name: string) => void;
-}
+export function SettingsModal() {
+  const {
+    modalVisible,
+    overlayOpacity,
+    sheetTranslateY,
+    activeDropdown,
+    langSearch,
+    setLangSearch,
+    language,
+    changeLanguage,
+    speaker,
+    changeSpeaker,
+    stt,
+    changeStt,
+    mic,
+    changeMic,
+    punctuation,
+    setPunctuation,
+    cancelModal,
+    saveModal,
+    toggleDropdown,
+    closeDropdown,
+  } = useSettings();
 
-export function SettingsModal({
-  settingsModalVisible,
-  settingsOverlayOpacity,
-  settingsSheetY,
-  activeDropdown,
-  langSearch,
-  setLangSearch,
-  selectedLang,
-  setSelectedLang,
-  selectedSpeaker,
-  setSelectedSpeaker,
-  selectedStt,
-  setSelectedStt,
-  selectedMic,
-  setSelectedMic,
-  usePunctuation,
-  setUsePunctuation,
-  setActiveDropdown,
-  cancelSettings,
-  saveSettings,
-  toggleDropdown,
-}: SettingsModalProps) {
-  const langScrollbar = useCustomScrollbar({ barHeight: 22, trackPadding: 8 });
+  const langScrollbar = useCustomScrollbar({barHeight: 22, trackPadding: 8});
 
   const handleToggleDropdown = (name: string) => {
     toggleDropdown(name);
     langScrollbar.resetScroll();
   };
 
-  const speakerOptions = SPEAKER_OPTIONS.filter(o => o !== selectedSpeaker);
-  const sttOptions = STT_OPTIONS.filter(o => o !== selectedStt);
-  const micOptions = MIC_OPTIONS.filter(o => o !== selectedMic);
+  const speakerOptions = SPEAKER_OPTIONS.filter(o => o !== speaker);
+  const sttOptions = STT_OPTIONS.filter(o => o !== stt);
+  const micOptions = MIC_OPTIONS.filter(o => o !== mic);
 
   const filteredLanguages = LANGUAGE_OPTIONS.filter(l =>
     l.toLowerCase().includes(langSearch.toLowerCase()),
   );
 
-  if (!settingsModalVisible) {
+  if (!modalVisible) {
     return null;
   }
 
   return (
     <>
       <Animated.View
-        style={[styles.settingsOverlay, {opacity: settingsOverlayOpacity}]}
+        style={[styles.settingsOverlay, {opacity: overlayOpacity}]}
         pointerEvents="auto">
-        <Pressable style={styles.settingsOverlayPress} onPress={cancelSettings} />
+        <Pressable style={styles.settingsOverlayPress} onPress={cancelModal} />
       </Animated.View>
 
       <Animated.View
         style={[
           styles.settingsSheet,
-          {transform: [{translateY: settingsSheetY}]},
+          {transform: [{translateY: sheetTranslateY}]},
         ]}>
         <ScrollView
           bounces={false}
@@ -103,7 +83,7 @@ export function SettingsModal({
                 activeDropdown === 'lang' && styles.settingsRowActiveLang,
               ]}
               onPress={() => handleToggleDropdown('lang')}>
-              <Text style={styles.settingsRowText}>{selectedLang}</Text>
+              <Text style={styles.settingsRowText}>{language}</Text>
               <View
                 style={[
                   styles.chevronArrow,
@@ -114,37 +94,37 @@ export function SettingsModal({
           </View>
 
           <DropdownSelect
-            value={selectedSpeaker}
+            value={speaker}
             options={speakerOptions}
             isOpen={activeDropdown === 'speaker'}
             onToggle={() => handleToggleDropdown('speaker')}
             onSelect={opt => {
-              setSelectedSpeaker(opt);
-              setActiveDropdown(null);
+              changeSpeaker(opt);
+              closeDropdown();
             }}
             zIndex={activeDropdown === 'speaker' ? 10 : 3}
           />
 
           <DropdownSelect
-            value={selectedStt}
+            value={stt}
             options={sttOptions}
             isOpen={activeDropdown === 'stt'}
             onToggle={() => handleToggleDropdown('stt')}
             onSelect={opt => {
-              setSelectedStt(opt);
-              setActiveDropdown(null);
+              changeStt(opt);
+              closeDropdown();
             }}
             zIndex={activeDropdown === 'stt' ? 10 : 2}
           />
 
           <DropdownSelect
-            value={selectedMic}
+            value={mic}
             options={micOptions}
             isOpen={activeDropdown === 'mic'}
             onToggle={() => handleToggleDropdown('mic')}
             onSelect={opt => {
-              setSelectedMic(opt);
-              setActiveDropdown(null);
+              changeMic(opt);
+              closeDropdown();
             }}
             zIndex={activeDropdown === 'mic' ? 10 : 1}
           />
@@ -152,35 +132,35 @@ export function SettingsModal({
           <View style={styles.radioRow}>
             <Pressable
               style={styles.radioOption}
-              onPress={() => setUsePunctuation(true)}>
+              onPress={() => setPunctuation(true)}>
               <View
                 style={[
                   styles.radioCircle,
-                  usePunctuation && styles.radioCircleSelected,
+                  punctuation && styles.radioCircleSelected,
                 ]}>
-                {usePunctuation && <View style={styles.checkmark} />}
+                {punctuation && <View style={styles.checkmark} />}
               </View>
               <Text style={styles.radioLabel}>პუნქტუაცია</Text>
             </Pressable>
             <Pressable
               style={styles.radioOption}
-              onPress={() => setUsePunctuation(false)}>
+              onPress={() => setPunctuation(false)}>
               <View
                 style={[
                   styles.radioCircle,
-                  !usePunctuation && styles.radioCircleSelected,
+                  !punctuation && styles.radioCircleSelected,
                 ]}>
-                {!usePunctuation && <View style={styles.checkmark} />}
+                {!punctuation && <View style={styles.checkmark} />}
               </View>
               <Text style={styles.radioLabel}>ავტოკორექტი</Text>
             </Pressable>
           </View>
 
           <View style={styles.settingsButtons}>
-            <Pressable style={styles.cancelBtn} onPress={cancelSettings}>
+            <Pressable style={styles.cancelBtn} onPress={cancelModal}>
               <Text style={styles.cancelBtnText}>გაუქმება</Text>
             </Pressable>
-            <Pressable style={styles.saveBtn} onPress={saveSettings}>
+            <Pressable style={styles.saveBtn} onPress={saveModal}>
               <Text style={styles.saveBtnText}>დამახსოვრება</Text>
             </Pressable>
           </View>
@@ -216,13 +196,13 @@ export function SettingsModal({
                     key={lang}
                     style={styles.langOption}
                     onPress={() => {
-                      setSelectedLang(lang);
-                      setActiveDropdown(null);
+                      changeLanguage(lang);
+                      closeDropdown();
                     }}>
                     <Text
                       style={[
                         styles.langOptionText,
-                        selectedLang === lang && styles.langOptionTextSelected,
+                        language === lang && styles.langOptionTextSelected,
                       ]}>
                       {lang}
                     </Text>
